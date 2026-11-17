@@ -1,819 +1,83 @@
 <!DOCTYPE html>
-<html lang="it"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
-        window.__firebase_config = firebaseConfig;
-        window.__initial_auth_token = initialAuthToken;
-        window.__app_id = appId;
-            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwODA3MTcxMzc1MzE0NjYzMzY2NiIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjX2YwOTdiY2Y5MGQxZTkyOGFfaW5kZXguaHRtbC0yNzAifSwiZXhwIjoxNzk0OTUyODc1LCJpYXQiOjE3OTQ5NDkyNzUsImFsZyI6IlJTMjU2In0.Enlnjc8r_wH8jUsD_TPzrY8YO52c5sfQHWgO7uR-kTivssUcyJmiW9ilOf1F_E7yT0Fxg6ptPIXHcM_Wy_XnBFhgq2iRz8U05_eQ587EhMImEoyUojM1gga3VKzwBJQO8LcS0Sa3x0W454O__b2KSST4BiUIGcyOWN6-Dzhmr9vOfMrTpvVo--xL6wMN7vFq9VMg9MMw_gwzq05nVlwlTcog1gtKBnLA2O6kioaH9Tl6Lwsz3XEk7V7WWe39pCA4aV6-3TMGTUNVAM_FvC-_wbBExdg7CND4qqKX9Jl0ytVS28FRR6-G1pCNil-HiFXs7_iI2CDqMlQv3V-AIdM3Iw","c_f097bcf90d1e928a_index.html-270")</script><script data-bard-client-injected="true">
-  document.addEventListener('input', (event) => {
-    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
-      const clonedDoc = document.cloneNode(true);
-      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
-      injectedScripts.forEach(el => el.remove());
-      window.parent.postMessage({
-        type: 'inlineEdit',
-        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
-      }, '*');
-    }
-  });
-</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
-</script><script data-bard-client-injected="true">(function() {
-  const SCROLL_KEYS = new Set([
-    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
-  ]);
-  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
-
-  function isTextEntryTarget(target) {
-    if (!target) return false;
-    const tagName = target.tagName;
-    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
-        tagName === 'SELECT' || target.isContentEditable === true;
-  }
-
-  // An element absorbs the key only if it both overflows on the axis being
-  // scrolled and is configured to scroll on that axis. The cheap dimension
-  // test runs first because getComputedStyle forces a style recalc, and this
-  // runs on every keypress. Each axis is read from its own longhand: the
-  // 'overflow' shorthand serializes as two values when the axes differ, which
-  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
-  function canScroll(node, horizontal) {
-    const overflows = horizontal ? node.scrollWidth > node.clientWidth
-                                 : node.scrollHeight > node.clientHeight;
-    if (!overflows) return false;
-    const style = window.getComputedStyle(node);
-    const overflow = horizontal ? style.overflowX : style.overflowY;
-    return overflow === 'auto' || overflow === 'scroll';
-  }
-
-  // Walks up from the event target so nested scrollers keep their behavior.
-  // <body> is included because pages that pin the root height make it the
-  // scroll container.
-  function hasScrollableAncestor(target, horizontal) {
-    let node = target;
-    while (node && node !== document.documentElement) {
-      if (canScroll(node, horizontal)) return true;
-      node = node.parentElement;
-    }
-    return false;
-  }
-
-  function rootCanScroll(horizontal) {
-    const scroller = document.scrollingElement || document.documentElement;
-    if (!scroller) return false;
-    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
-    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
-                      : scroller.scrollHeight > window.innerHeight + 1;
-  }
-
-  window.addEventListener('keydown', function(event) {
-    if (!SCROLL_KEYS.has(event.key)) return;
-    if (event.defaultPrevented) return;
-    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
-    // reserved for shortcuts, so none of them are scroll intent.
-    if (event.altKey || event.metaKey || event.ctrlKey) return;
-
-    const target = event.target;
-    if (isTextEntryTarget(target)) return;
-
-    // Anything that can still absorb the scroll gets to keep it.
-    const horizontal = HORIZONTAL_KEYS.has(event.key);
-    if (rootCanScroll(horizontal)) return;
-    if (hasScrollableAncestor(target, horizontal)) return;
-
-    event.preventDefault();
-  }, {capture: true, passive: false});
-})();</script><script data-bard-client-injected="true">(function() {
-  // Ensure this script is executed only once
-  if (window.firebaseAuthBridgeScriptLoaded) {
-    return;
-  }
-  window.firebaseAuthBridgeScriptLoaded = true;
-
-  let nextTokenPromiseId = 0;
-
-  // Stores { resolve, reject } for ongoing token requests
-  const pendingTokenPromises = {};
-
-  // Listen for messages from the Host Application
-  window.addEventListener('message', function(event) {
-
-    const messageData = event.data;
-
-  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
-      const { success, token, error, promiseId } = messageData ?? {};
-      if (pendingTokenPromises[promiseId]) {
-        if (success) {
-          pendingTokenPromises[promiseId].resolve(token);
-        } else {
-          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
-        }
-        delete pendingTokenPromises[promiseId];
-      }
-    }
-  });
-
-  // Expose a function for the Generated App to request a new Firebase token
-  window.requestNewFirebaseToken = function() {
-    const currentPromiseId = nextTokenPromiseId++;
-    const promise = new Promise((resolve, reject) => {
-      pendingTokenPromises[currentPromiseId] = { resolve, reject };
-    });
-    if (window.parent && window.parent !== window) {
-      window.parent.postMessage({
-        type: 'REQUEST_NEW_FIREBASE_TOKEN',
-        promiseId: currentPromiseId
-      }, '*');
-    } else {
-      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
-      delete pendingTokenPromises[currentPromiseId];
-    }
-    return promise;
-  };
-})();</script><script data-bard-client-injected="true">
-let realOriginalGetUserMedia = null;
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+<html lang="it"><head><script>(function(){
+function slug(s){
+  try{return s.trim().toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu,'').replace(/\s+/g,'-');}
+  catch(e){return s.trim().toLowerCase().replace(/[^a-z0-9\s_-]/g,'').replace(/\s+/g,'-');}
 }
-
-(function() {
-  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
-    try {
-      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
-        get: function() {
-          return undefined; // Or throw an error
-        },
-        configurable: false
-      });
-    } catch (error) {
-      console.error("Error defining prototype getter:", error);
+function findHashTarget(hash){
+  if(!hash||hash==='#')return null;
+  var raw=hash.charAt(0)==='#'?hash.slice(1):hash;
+  var dec=raw;
+  try{dec=decodeURIComponent(raw);}catch(e){}
+  var el=document.getElementById(raw)||document.getElementById(dec);
+  if(el)return el;
+  try{
+    if(typeof CSS!=='undefined'&&CSS.escape){
+      el=document.querySelector('[name="'+CSS.escape(raw)+'"]')||
+         document.querySelector('[name="'+CSS.escape(dec)+'"]');
+    }else{
+      var named=document.getElementsByName(raw);
+      if(named&&named.length>0)return named[0];
+    }
+  }catch(e){}
+  if(el)return el;
+  var targetSlug=slug(dec);
+  if(targetSlug){
+    var headings=document.querySelectorAll('h1,h2,h3,h4,h5,h6');
+    for(var i=0;i<headings.length;i++){
+      if(slug(headings[i].textContent||'')===targetSlug)return headings[i];
     }
   }
-})();
-
-(function() {
-  const pendingMediaResolvers = {};
-  let nextMediaPromiseId = 0;
-
-  function requestMediaPermissions(constraints) {
-    const mediaPromiseId = nextMediaPromiseId++;
-    const promise = new Promise((resolve, reject) => {
-      pendingMediaResolvers[mediaPromiseId] = (granted) => {
-        delete pendingMediaResolvers[mediaPromiseId];
-        resolve(granted);
-      };
-    });
-
-    window.parent.postMessage({
-      type: 'requestMediaPermission',
-      constraints: constraints,
-      promiseId: mediaPromiseId,
-    }, '*');
-
-    return promise;
-  }
-
-  let originalGetUserMedia = realOriginalGetUserMedia;
-
-  function interceptGetUserMedia() {
-    if (navigator.mediaDevices) {
-      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
-        value: function(constraints) {
-          return requestMediaPermissions(constraints).then((granted) => {
-            if (granted) {
-              if (originalGetUserMedia) {
-                return originalGetUserMedia(constraints);
-              } else {
-                throw new Error("Original getUserMedia not available.");
-              }
-            } else {
-              throw new DOMException('Permission denied', 'NotAllowedError');
-            }
-          });
-        },
-        writable: false,
-        configurable: false
-      });
+  return null;
+}
+function getInPageHash(a,href){
+  if(href.charAt(0)==='#')return href;
+  try{
+    var u=new URL(href,window.location.href);
+    if(u.hash&&u.origin===window.location.origin&&u.pathname===window.location.pathname){
+      return u.hash;
     }
-  }
-
-  interceptGetUserMedia();
-
-  const observer = new MutationObserver(function(mutationsList, observer) {
-    for (const mutation of mutationsList) {
-      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
-        interceptGetUserMedia();
-      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
-        interceptGetUserMedia();
-      } else if (mutation.type === 'childList' && mutation.addedNodes) {
-        mutation.addedNodes.forEach(node => {
-          if (node === navigator.mediaDevices) {
-            interceptGetUserMedia();
-          }
-        });
-      }
-    }
-  });
-
-  function interceptSpeechRecognition() {
-    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-      return;
-    }
-
-    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    const SpeechRecognitionWrapper = function(...args) {
-      const recognizer = new OriginalSpeechRecognition(...args);
-      const originalStart = recognizer.start.bind(recognizer);
-
-      recognizer.start = function() {
-        requestMediaPermissions({ audio: true }).then(granted => {
-          if (granted) {
-            originalStart();
-          } else {
-            const errorEvent = new SpeechRecognitionErrorEvent('error');
-            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
-            recognizer.dispatchEvent(errorEvent);
-          }
-        });
-      };
-
-      return recognizer;
-    };
-
-    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
-    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
-
-    if (window.SpeechRecognition) {
-      window.SpeechRecognition = SpeechRecognitionWrapper;
-    }
-    if (window.webkitSpeechRecognition) {
-      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
-    }
-  }
-
-  interceptSpeechRecognition();
-
-  window.addEventListener('message', function(event) {
-    if (event.data) {
-      if (event.data.type === 'resolveMediaPermission') {
-        const { promiseId, granted } = event.data;
-        if (pendingMediaResolvers[promiseId]) {
-          pendingMediaResolvers[promiseId](granted);
-        }
-      }
-    }
-  });
-
-})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
-function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
-
- Copyright The Closure Library Authors.
- SPDX-License-Identifier: Apache-2.0
-*/
-function A(b,d){function e(){}e.prototype=d.prototype;b.i=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
-let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
-null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.extensions="";var l=0,t=null,r=null,q=[],F=new TextEncoder,
-G=new TextDecoder;c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*
-16|0;return(f==="x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;
-(g=t)==null||g.postMessage(a)}};Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
-(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
-url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
-</script><script data-bard-client-injected="true">((function(modelInformation) {
-  const originalFetch = window.fetch;
-  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
-  let googleLlmBaseApiUrls = [
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
-    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
-  ];
-  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
-    googleLlmBaseApiUrls.push(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
-    );
-  });
-  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
-    googleLlmBaseApiUrls.push(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
-    );
-  });
-  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
-    googleLlmBaseApiUrls.push(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
-    );
-  });
-  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
-    googleLlmBaseApiUrls.push(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
-      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
-    );
-  });
-
-  const pendingFetchResolvers = {};
-  let nextPromiseId = 0;
-
-  function handleStringInput(input, optionsArgument) {
-    const actualUrl = input;
-    const fetchCallArgs = [actualUrl, optionsArgument];
-    const effectiveOptions = optionsArgument || {};
-    const bodyForApiKeyCheck = effectiveOptions.body;
-    const bodyForPostMessage = effectiveOptions.body;
-    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
-  }
-
-  function handleRequestInput(input, optionsArgument) {
-    const actualUrl = input.url;
-    const fetchCallArgs = [input, optionsArgument];
-    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
-    let bodyForApiKeyCheck;
-    let bodyForPostMessage;
-
-    if (optionsArgument) {
-      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
-      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
-      if ('body' in optionsArgument) {
-        bodyForApiKeyCheck = optionsArgument.body;
-        bodyForPostMessage = optionsArgument.body;
-      } else {
-        bodyForApiKeyCheck = undefined;
-        bodyForPostMessage = input.body;
-      }
-    } else {
-      bodyForApiKeyCheck = undefined;
-      bodyForPostMessage = input.body;
-    }
-    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
-  }
-
-  window.fetch = function(input, optionsArgument) {
-    let actualUrl;
-    let fetchCallArgs;
-    let effectiveOptions = {};
-    let bodyForApiKeyCheck;
-    let bodyForPostMessage;
-
-    if (typeof input === 'string') {
-      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
-    } else if (input instanceof Request) {
-      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
-    } else {
-      return originalFetch.apply(window, [input, optionsArgument]);
-    }
-
-    effectiveOptions.method = effectiveOptions.method || 'GET';
-    if (!effectiveOptions.headers) {
-      effectiveOptions.headers = new Headers();
-    }
-
-
-    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
-      let apiKeyIsNull = true;
-
-      const regex = new RegExp("models/([^:]+)");
-      const modelNameMatch = actualUrl.match(regex);
-      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
-
-
-      try {
-        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
-        const apiKeyParam = urlObject.searchParams.get('key');
-        if (apiKeyParam) {
-          apiKeyIsNull = false;
-        }
-      } catch (e) {
-        // Continue checks even if URL parsing fails
-      }
-
-      if (apiKeyIsNull && effectiveOptions.headers) {
-        const h = new Headers(effectiveOptions.headers);
-        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
-        if (apiKeyHeaderValue) {
-          apiKeyIsNull = false;
-          return originalFetch.apply(window, fetchCallArgs);
-        }
-      }
-
-      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
-        try {
-          const bodyData = JSON.parse(bodyForApiKeyCheck);
-          if (bodyData && bodyData.apiKey) {
-            apiKeyIsNull = false;
-            return originalFetch.apply(window, fetchCallArgs);
-          }
-        } catch (e) {
-          // Ignore JSON parsing errors
-        }
-      }
-
-      if(apiKeyIsNull) {
-        const promiseId = nextPromiseId++;
-        const promise = new Promise((resolve) => {
-          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
-            delete pendingFetchResolvers[promiseId];
-            resolve(resolvedResponse);
-          };
-        });
-
-        let serializedBodyForPostMessage;
-        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
-            serializedBodyForPostMessage = bodyForPostMessage;
-        } else if (bodyForPostMessage instanceof ReadableStream) {
-            serializedBodyForPostMessage = null;
-        } else {
-            try {
-                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
-            } catch (e) {
-                serializedBodyForPostMessage = null;
-            }
-        }
-
-        const messageOptions = {
-            method: effectiveOptions.method,
-            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
-            body: serializedBodyForPostMessage
-        };
-
-        window.parent.postMessage({
-          type: 'requestFetch',
-          url: actualUrl,
-          modelName: modelName,
-          options: messageOptions,
-          promiseId: promiseId,
-        }, '*');
-
-        return promise;
-      }
-      return originalFetch.apply(window, fetchCallArgs);
-    }
-    return originalFetch.apply(window, fetchCallArgs);
-  };
-
-  window.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'resolveFetch') {
-      const { promiseId, response } = event.data;
-      if (pendingFetchResolvers[promiseId]) {
-        try {
-          const reconstructedResponse = new Response(response.body, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: new Headers(response.headers),
-          });
-          pendingFetchResolvers[promiseId](reconstructedResponse);
-        } catch (error) {
-          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
-        }
-      }
-    }
-  });
-
-}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function() {
-  const OVERLAY_SELECTOR =
-    'dialog[open], [role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [role="combobox"]';
-
-  function isVisibleOverlay(element) {
-    if (element.closest('[hidden], [aria-hidden="true"], [inert]')) {
-      return false;
-    }
-    if (window.getComputedStyle(element).visibility === 'hidden') {
-      return false;
-    }
-    for (let cur = element; cur; cur = cur.parentElement) {
-      if (window.getComputedStyle(cur).display === 'none') {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  function hasOpenOverlay() {
-    const candidates = document.querySelectorAll(OVERLAY_SELECTOR);
-    for (let i = 0; i < candidates.length; i++) {
-      if (isVisibleOverlay(candidates[i])) {
-        return true;
-      }
-    }
-    try {
-      if (document.querySelector('[popover]:popover-open')) {
-        return true;
-      }
-    } catch (e) {
-      // Ignore engines that do not support :popover-open.
-    }
-    return false;
-  }
-
-  function isNonEmptySearchInput(target) {
-    return (
-      Boolean(target) &&
-      target.tagName === 'INPUT' &&
-      typeof target.type === 'string' &&
-      target.type.toLowerCase() === 'search' &&
-      typeof target.value === 'string' &&
-      target.value.length > 0
-    );
-  }
-
-  function shouldIgnoreEscape(event) {
-    return (
-      event.key !== 'Escape' ||
-      event.altKey ||
-      event.ctrlKey ||
-      event.metaKey ||
-      event.shiftKey ||
-      event.isComposing ||
-      event.repeat ||
-      event.keyCode === 229 ||
-      isNonEmptySearchInput(event.target)
-    );
-  }
-
-  let shouldIgnoreCaptureState = false;
-
-  window.addEventListener(
-    'keydown',
-    function(event) {
-      if (event.key === 'Escape') {
-        shouldIgnoreCaptureState =
-          hasOpenOverlay() || isNonEmptySearchInput(event.target);
-      }
-    },
-    {capture: true},
-  );
-
-  window.addEventListener('keydown', function(event) {
-    if (
-      shouldIgnoreEscape(event) ||
-      event.defaultPrevented ||
-      shouldIgnoreCaptureState
-    ) {
-      return;
-    }
-    const wasBlockedOnCapture = shouldIgnoreCaptureState;
-    queueMicrotask(function() {
-      if (event.defaultPrevented || wasBlockedOnCapture) {
-        return;
-      }
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({'type': 'escapeKey'}, '*');
-      }
-    });
-  });
-})();</script><script data-bard-client-injected="true">(function() {
-  function normalizeSlug(str) {
-    try {
-      return str
-        .trim()
-        .toLowerCase()
-        .replace(/[^p{L}p{N}s_-]/gu, '')
-        .replace(/s+/g, '-');
-    } catch (e) {
-      return str
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9s_-]/g, '')
-        .replace(/s+/g, '-');
-    }
-  }
-
-  function findTargetElement(hash) {
-    if (!hash || hash === '#') {
-      return null;
-    }
-    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
-    let decodedId = rawId;
-    try {
-      decodedId = decodeURIComponent(rawId);
-    } catch (e) {
-      // Ignore URI malformed errors.
-    }
-
-    // 1. Direct ID match (raw and decoded).
-    let target = document.getElementById(rawId) || document.getElementById(decodedId);
-    if (target) {
-      return target;
-    }
-
-    // 2. Name attribute match (<a name="...">).
-    try {
-      if (typeof CSS !== 'undefined' && CSS.escape) {
-        target =
-          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
-          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
-      } else {
-        const namedElements = document.getElementsByName(rawId);
-        if (namedElements && namedElements.length > 0) {
-          return namedElements[0];
-        }
-      }
-    } catch (e) {
-      // Ignore querySelector syntax errors.
-    }
-    if (target) {
-      return target;
-    }
-
-    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
-    const targetSlug = normalizeSlug(decodedId);
-    if (targetSlug) {
-      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
-        if (normalizeSlug(heading.textContent || '') === targetSlug) {
-          return heading;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  document.addEventListener('click', function(event) {
-    const target = event.target;
-    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
-    if (!anchor) {
-      return;
-    }
-
-    const href = anchor.getAttribute('href');
-    if (
-      !href ||
-      href.trim().toLowerCase().startsWith('javascript:') ||
-      anchor.hasAttribute('download')
-    ) {
-      return;
-    }
-
-    // Check if the link is an in-page hash / anchor link.
-    if (href.startsWith('#')) {
-      event.preventDefault();
-      const targetElement = findTargetElement(href);
-      if (targetElement) {
-        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
-      }
-      return;
-    }
-
-    // Check if the URL has the same origin/pathname but with a hash.
-    try {
-      const url = new URL(anchor.href, window.location.href);
-      if (
-        url.hash &&
-        url.origin === window.location.origin &&
-        url.pathname === window.location.pathname
-      ) {
-        event.preventDefault();
-        const targetElement = findTargetElement(url.hash);
-        if (targetElement) {
-          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
-        }
-        return;
-      }
-    } catch (e) {
-      // Fall through if URL parsing fails.
-    }
-
-    // For all external or full navigation links, prevent iframe-level navigation
-    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
-    // safely in a new tab/window.
-    if (anchor.target !== '_blank') {
-      event.preventDefault();
-      window.open(anchor.href, '_blank', 'noopener,noreferrer');
-    }
-  }, {capture: true});
-})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
-</script><script data-bard-client-injected="true">(function() {
-  const originalConsoleLog = console.log;
-  const originalConsoleError = console.error;
-
-    /**
-   * Normalizes an error event or a promise rejection reason into a structured error object.
-   * @param {*} errorEventOrReason The error object or reason.
-   * @return {object} Structured error data { message, name, stack }.
-   */
-  function getErrorObject(errorEventOrReason) {
-    if (errorEventOrReason instanceof Error) {
-      return {
-        message: errorEventOrReason.message,
-        name: errorEventOrReason.name,
-        stack: errorEventOrReason.stack,
-      };
-    }
-    // Fallback for non-Error objects.
-    try {
-      return {
-        message: JSON.stringify(errorEventOrReason),
-        name: 'UnknownErrorType',
-        stack: null,
-      };
-    } catch (e) {
-      return {
-        message: String(errorEventOrReason),
-        name: 'UnknownErrorTypeNonStringifiable',
-        stack: null,
-      };
-    }
-  }
-
-  /**
-   * Converts an array of arguments (from log/error) into a single string.
-   * Handles Error objects specially to include their message and stack.
-   * @param {Array<*>} args - Arguments passed to console methods.
-   * @return {string} A string representation of the arguments.
-   */
-  function stringifyArgs(args) {
-    return args
-      .map((arg) => {
-        if (arg instanceof Error) {
-          const {message, stack} = arg;
-          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
-        }
-        if (typeof arg === 'object' && arg !== null) {
-          try {
-            return JSON.stringify(arg);
-          } catch (error) {
-            return '[Circular Object]';
-          }
-        } else {
-          return String(arg);
-        }
-      })
-      .join(' ');
-  }
-
-  console.log = function(...args) {
-    const logString = stringifyArgs(args);
-    window.parent.postMessage({ type: 'log', message: logString }, '*');
-    originalConsoleLog.apply(console, args);
-  };
-
-  console.error = function(...args) {
-    let errorData;
-    if (args.length > 0 && args[0] instanceof Error) {
-      const err = args[0];
-      // If the first arg is an Error, capture its details.
-      errorData = {
-        type: 'error',
-        source: 'CONSOLE_ERROR',
-        ...getErrorObject(err),
-        rawArgsString: stringifyArgs(args.slice(1)),
-        timestamp: new Date().toISOString(),
-      };
-    } else {
-      // If not an Error object, treat all args as a general error message.
-      errorData = {
-        type: 'error',
-        source: 'CONSOLE_ERROR',
-        message: stringifyArgs(args),
-        name: 'ConsoleLoggedError',
-        stack: null,
-        timestamp: new Date().toISOString(),
-      };
-    }
-    window.parent.postMessage(errorData, '*');
-    originalConsoleError.apply(console, args);
-  };
-
-  // Listen for global unhandled synchronous errors.
-  window.addEventListener('error', function(event) {
-    const errorDetails = event.error ? getErrorObject(event.error) : {
-      message: event.message,
-      name: 'GlobalError',
-      stack: null,
-      filename: event.filename,
-      lineno: event.lineno,
-      colno: event.colno,
-    };
-
-    window.parent.postMessage({
-      type: 'error',
-      source: 'global',
-      ...errorDetails,
-      message: errorDetails.message || event.message,
-      timestamp: new Date().toISOString(),
-    }, '*');
-  });
-
-  // Listen for unhandled promise rejections (asynchronous errors).
-  window.addEventListener('unhandledrejection', function(event) {
-    const errorDetails = getErrorObject(event.reason);
-
-    window.parent.postMessage({
-      type: 'error',
-      source: 'unhandledrejection',
-      ...errorDetails,
-      message: errorDetails.message || 'Unhandled Promise Rejection',
-      timestamp: new Date().toISOString(),
-    }, '*');
-  });
-
+  }catch(e){}
+  return null;
+}
+function findAnchor(target){
+  var el=target instanceof Element?target:(target&&target.parentElement?target.parentElement:null);
+  return el&&typeof el.closest==='function'?el.closest('a'):null;
+}
+function configureAnchor(a){
+  var href=a.getAttribute('href');
+  if(!href||href.trim().toLowerCase().indexOf('javascript:')===0||a.hasAttribute('download'))return;
+  if(getInPageHash(a,href)!==null)return;
+  var t=a.getAttribute('target');
+  if(!t||t.toLowerCase()!=='_blank'){a.setAttribute('target','_blank');}
+  if(!a.getAttribute('rel')){a.setAttribute('rel','noopener noreferrer');}
+}
+function configureAllAnchors(){
+  var anchors=document.querySelectorAll('a[href]');
+  for(var i=0;i<anchors.length;i++){configureAnchor(anchors[i]);}
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',configureAllAnchors,{once:true});
+}else{
+  configureAllAnchors();
+}
+document.addEventListener('click',function(event){
+  var a=findAnchor(event.target);
+  if(a)configureAnchor(a);
+},{capture:true});
+document.addEventListener('click',function(event){
+  if(event.defaultPrevented)return;
+  var a=findAnchor(event.target);
+  if(!a)return;
+  var href=a.getAttribute('href');
+  if(!href||href.trim().toLowerCase().indexOf('javascript:')===0||a.hasAttribute('download'))return;
+  var hash=getInPageHash(a,href);
+  if(hash===null)return;
+  event.preventDefault();
+  if(hash==='#'){window.scrollTo({top:0,behavior:'smooth'});return;}
+  var targetEl=findHashTarget(hash);
+  if(targetEl){targetEl.scrollIntoView({behavior:'smooth',block:'start'});}
+});
 })();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -853,7 +117,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
             manifestLink.href = URL.createObjectURL(manifestBlob);
             document.head.appendChild(manifestLink);
         })();
-    </script><link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22%230f172a%22%2F%3E%3Crect%20x%3D%2244%22%20y%3D%2244%22%20width%3D%22424%22%20height%3D%22424%22%20rx%3D%2288%22%20fill%3D%22%23f59e0b%22%2F%3E%3Cpath%20d%3D%22M256%20128L128%20192l128%2064%20128-64-128-64zm0%20256l-128-64V224l128%2064%20128-64v96l-128%2064z%22%20fill%3D%22%230f172a%22%2F%3E%3C%2Fsvg%3E"><link rel="manifest" href="blob:https://3eoowd8a1zvdv7zd9qndnrv9gyl5uesr8zvh97wz81p0dofz7y-h1018257101.scf.usercontent.goog/11f69d74-4de4-4e27-9a0d-7d3012ad4b12">
+    </script><link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22%230f172a%22%2F%3E%3Crect%20x%3D%2244%22%20y%3D%2244%22%20width%3D%22424%22%20height%3D%22424%22%20rx%3D%2288%22%20fill%3D%22%23f59e0b%22%2F%3E%3Cpath%20d%3D%22M256%20128L128%20192l128%2064%20128-64-128-64zm0%20256l-128-64V224l128%2064%20128-64v96l-128%2064z%22%20fill%3D%22%230f172a%22%2F%3E%3C%2Fsvg%3E"><link rel="manifest" href="blob:https://4vj1wlw5jetj4m6goopqget2hraybop737khnem6gubxvdx3g5-h1013078785.scf.usercontent.goog/eec4f465-9222-4fa9-bfe6-9d1af1644cd3">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
     <style>
@@ -1090,15 +354,10 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     <span class="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">Max 6</span>
                     
                 <svg viewBox="0 0 76 62" class="w-16 h-14 mx-auto drop-shadow-sm">
-                    <!-- Ombra a terra -->
                     <polygon points="38.0,54.0 62.2,40.0 38.0,26.0 13.8,40.0" fill="#0f172a" fill-opacity="0.12" transform="translate(0, 2)"></polygon>
-                    <!-- Faccia Sinistra -->
                     <polygon points="38.0,54.0 13.8,40.0 13.8,21.8 38.0,35.8" fill="#3b82f6" fill-opacity="0.82" stroke="#0f172a" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Destra -->
                     <polygon points="38.0,54.0 62.2,40.0 62.2,21.8 38.0,35.8" fill="#3b82f6" fill-opacity="0.65" stroke="#0f172a" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Superiore -->
                     <polygon points="38.0,35.8 62.2,21.8 38.0,7.8 13.8,21.8" fill="#3b82f6" fill-opacity="0.98" stroke="#0f172a" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Linea nastro adesivo centrale sul coperchio -->
                     <line x1="25.9" y1="28.8" x2="50.1" y2="14.8" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.3"></line>
                 </svg>
             
@@ -1110,15 +369,10 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     <span class="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">Max 6</span>
                     
                 <svg viewBox="0 0 76 62" class="w-16 h-14 mx-auto drop-shadow-sm">
-                    <!-- Ombra a terra -->
                     <polygon points="38.0,54.0 62.2,40.0 38.0,26.0 13.8,40.0" fill="#0f172a" fill-opacity="0.12" transform="translate(0, 2)"></polygon>
-                    <!-- Faccia Sinistra -->
                     <polygon points="38.0,54.0 13.8,40.0 13.8,23.2 38.0,37.2" fill="#f59e0b" fill-opacity="0.82" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Destra -->
                     <polygon points="38.0,54.0 62.2,40.0 62.2,23.2 38.0,37.2" fill="#f59e0b" fill-opacity="0.65" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Superiore -->
                     <polygon points="38.0,37.2 62.2,23.2 38.0,9.2 13.8,23.2" fill="#f59e0b" fill-opacity="0.98" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Linea nastro adesivo centrale sul coperchio -->
                     <line x1="25.9" y1="30.2" x2="50.1" y2="16.2" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.3"></line>
                 </svg>
             
@@ -1130,15 +384,10 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     <span class="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">Max 5</span>
                     
                 <svg viewBox="0 0 76 62" class="w-16 h-14 mx-auto drop-shadow-sm">
-                    <!-- Ombra a terra -->
                     <polygon points="38.0,54.0 62.2,40.0 42.8,28.8 18.6,42.8" fill="#0f172a" fill-opacity="0.12" transform="translate(0, 2)"></polygon>
-                    <!-- Faccia Sinistra -->
                     <polygon points="38.0,54.0 18.6,42.8 18.6,26.0 38.0,37.2" fill="#10b981" fill-opacity="0.82" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Destra -->
                     <polygon points="38.0,54.0 62.2,40.0 62.2,23.2 38.0,37.2" fill="#10b981" fill-opacity="0.65" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Superiore -->
                     <polygon points="38.0,37.2 62.2,23.2 42.8,12.0 18.6,26.0" fill="#10b981" fill-opacity="0.98" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Linea nastro adesivo centrale sul coperchio -->
                     <line x1="28.3" y1="31.6" x2="52.5" y2="17.6" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.3"></line>
                 </svg>
             
@@ -1150,15 +399,10 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     <span class="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">Max 5</span>
                     
                 <svg viewBox="0 0 76 62" class="w-16 h-14 mx-auto drop-shadow-sm">
-                    <!-- Ombra a terra -->
                     <polygon points="38.0,54.0 62.2,40.0 46.1,30.7 21.8,44.7" fill="#0f172a" fill-opacity="0.12" transform="translate(0, 2)"></polygon>
-                    <!-- Faccia Sinistra -->
                     <polygon points="38.0,54.0 21.8,44.7 21.8,30.7 38.0,40.0" fill="#8b5cf6" fill-opacity="0.82" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Destra -->
                     <polygon points="38.0,54.0 62.2,40.0 62.2,26.0 38.0,40.0" fill="#8b5cf6" fill-opacity="0.65" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Superiore -->
                     <polygon points="38.0,40.0 62.2,26.0 46.1,16.7 21.8,30.7" fill="#8b5cf6" fill-opacity="0.98" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Linea nastro adesivo centrale sul coperchio -->
                     <line x1="29.9" y1="35.3" x2="54.2" y2="21.3" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.3"></line>
                 </svg>
             
@@ -1170,15 +414,10 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     <span class="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">Max 4</span>
                     
                 <svg viewBox="0 0 76 62" class="w-16 h-14 mx-auto drop-shadow-sm">
-                    <!-- Ombra a terra -->
                     <polygon points="38.0,54.0 62.2,40.0 44.1,29.5 19.8,43.5" fill="#0f172a" fill-opacity="0.12" transform="translate(0, 2)"></polygon>
-                    <!-- Faccia Sinistra -->
                     <polygon points="38.0,54.0 19.8,43.5 19.8,24.8 38.0,35.3" fill="#ec4899" fill-opacity="0.82" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Destra -->
                     <polygon points="38.0,54.0 62.2,40.0 62.2,21.3 38.0,35.3" fill="#ec4899" fill-opacity="0.65" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Superiore -->
                     <polygon points="38.0,35.3 62.2,21.3 44.1,10.8 19.8,24.8" fill="#ec4899" fill-opacity="0.98" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Linea nastro adesivo centrale sul coperchio -->
                     <line x1="28.9" y1="30.1" x2="53.2" y2="16.1" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.3"></line>
                 </svg>
             
@@ -1190,15 +429,10 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     <span class="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">Max 10</span>
                     
                 <svg viewBox="0 0 76 62" class="w-16 h-14 mx-auto drop-shadow-sm">
-                    <!-- Ombra a terra -->
                     <polygon points="38.0,54.0 62.2,40.0 46.7,31.0 22.4,45.0" fill="#0f172a" fill-opacity="0.12" transform="translate(0, 2)"></polygon>
-                    <!-- Faccia Sinistra -->
                     <polygon points="38.0,54.0 22.4,45.0 22.4,37.0 38.0,46.0" fill="#06b6d4" fill-opacity="0.82" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Destra -->
                     <polygon points="38.0,54.0 62.2,40.0 62.2,32.0 38.0,46.0" fill="#06b6d4" fill-opacity="0.65" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Faccia Superiore -->
                     <polygon points="38.0,46.0 62.2,32.0 46.7,23.0 22.4,37.0" fill="#06b6d4" fill-opacity="0.98" stroke="#334155" stroke-width="1.1" stroke-linejoin="round"></polygon>
-                    <!-- Linea nastro adesivo centrale sul coperchio -->
                     <line x1="30.2" y1="41.5" x2="54.5" y2="27.5" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.3"></line>
                 </svg>
             
@@ -1371,7 +605,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
     </main>
 
     <!-- MODAL: Gestione Catalogo Codici & Import/Export JSON -->
-    <div id="catalog-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto no-print">
+    <div id="catalog-modal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto no-print hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 my-auto max-h-[92vh] flex flex-col">
             <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2.5">
@@ -1382,7 +616,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     </div>
                     <div>
                         <h3 class="font-bold text-base">Catalogo Codici &amp; Dimensioni (<span id="modal-catalog-total">6</span>)</h3>
-                        <p class="text-[11px] text-slate-400">Aggiungi, modifica o importa/esporta l'elenco delle scatole</p>
+                        <p class="text-[11px] text-slate-400">Salvato automaticamente in memoria sul dispositivo</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCatalogModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg">
@@ -1438,9 +672,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     </div>
 
                     <div class="flex justify-end pt-1">
-                        <button type="submit" id="btn-save-catalog" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition">
-                            + Salva nel Catalogo
-                        </button>
+                        <button type="submit" id="btn-save-catalog" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition">+ Salva nel Catalogo</button>
                     </div>
                 </form>
 
@@ -1738,7 +970,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
         }
 
         // =========================================================================
-        // 3. STATO DELL'APPLICAZIONE & CARICAMENTO CATALOGO
+        // 3. STATO DELL'APPLICAZIONE & SALVATAGGIO PERSISTENTE CATALOGO
         // =========================================================================
         const DEFAULT_CATALOG = [
             { id: 'cat-1', code: 'STD-3737-24', desc: 'Scatola Cubica 37×37×24', l: 37, w: 37, h: 24, weight: 7.0, maxLayers: null },
@@ -1749,7 +981,57 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
             { id: 'cat-6', code: 'LOW-6743-13', desc: 'Vassoio Basso 67×43×13', l: 67, w: 43, h: 13, weight: 8.5, maxLayers: null }
         ];
 
-        function loadInitialCatalog() {
+        const STORAGE_KEY_CATALOG = 'pallet_optimizer_catalog_v2';
+        const IDB_DB_NAME = 'PalletOptimizerDB';
+        const IDB_STORE_NAME = 'app_data';
+
+        function openCatalogIDB() {
+            return new Promise((resolve, reject) => {
+                if (!window.indexedDB) return reject(new Error('No IndexedDB'));
+                const req = indexedDB.open(IDB_DB_NAME, 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(IDB_STORE_NAME)) {
+                        db.createObjectStore(IDB_STORE_NAME);
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function writeCatalogToIDB(items) {
+            try {
+                const db = await openCatalogIDB();
+                const tx = db.transaction(IDB_STORE_NAME, 'readwrite');
+                tx.objectStore(IDB_STORE_NAME).put(items, 'saved_catalog');
+                return new Promise(res => {
+                    tx.oncomplete = () => { db.close(); res(true); };
+                    tx.onerror = () => { db.close(); res(false); };
+                });
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function readCatalogFromIDB() {
+            try {
+                const db = await openCatalogIDB();
+                const tx = db.transaction(IDB_STORE_NAME, 'readonly');
+                const req = tx.objectStore(IDB_STORE_NAME).get('saved_catalog');
+                return new Promise(res => {
+                    req.onsuccess = () => {
+                        db.close();
+                        res(Array.isArray(req.result) && req.result.length > 0 ? req.result : null);
+                    };
+                    req.onerror = () => { db.close(); res(null); };
+                });
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function loadInitialCatalogSync() {
             // 1) Controlla se il catalogo è stato passato nell'URL (#cat=...)
             try {
                 const hash = window.location.hash || '';
@@ -1758,35 +1040,40 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     const decodedStr = decodeURIComponent(escape(atob(decodeURIComponent(match[1]))));
                     const parsedUrlCat = JSON.parse(decodedStr);
                     if (Array.isArray(parsedUrlCat) && parsedUrlCat.length > 0) {
-                        return parsedUrlCat;
+                        return { items: parsedUrlCat, source: 'URL' };
                     }
                 }
             } catch (e) {}
 
-            // 2) Controlla se esiste un catalogo incorporato nel file HTML condiviso
+            // 2) Controlla la memoria locale persistente dell'utente (prioritaria sui predefiniti!)
+            for (const key of [STORAGE_KEY_CATALOG, 'pallet_optimizer_catalog_v1']) {
+                try {
+                    const saved = localStorage.getItem(key);
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            return { items: parsed, source: 'STORAGE' };
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 3) Controlla se esiste un catalogo incorporato nel file HTML condiviso
             try {
                 const embeddedEl = document.getElementById('embedded-catalog-data');
                 if (embeddedEl && embeddedEl.textContent.trim() && embeddedEl.textContent.trim() !== 'null') {
                     const parsedEmbedded = JSON.parse(embeddedEl.textContent);
                     if (Array.isArray(parsedEmbedded) && parsedEmbedded.length > 0) {
-                        return parsedEmbedded;
+                        return { items: parsedEmbedded, source: 'EMBEDDED' };
                     }
                 }
             } catch (e) {}
 
-            // 3) Altrimenti carica da localStorage o usa il catalogo predefinito
-            try {
-                const saved = localStorage.getItem('pallet_optimizer_catalog_v1');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-                }
-            } catch (e) {}
-
-            return [...DEFAULT_CATALOG];
+            return { items: [...DEFAULT_CATALOG], source: 'DEFAULT' };
         }
 
-        let catalog = loadInitialCatalog();
+        const initialBoot = loadInitialCatalogSync();
+        let catalog = initialBoot.items;
 
         let state = {
             transportMode: 'AIR',
@@ -1862,9 +1149,24 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
         }
 
         function saveCatalogToStorage() {
+            const jsonStr = JSON.stringify(catalog);
+            // 1) Salva su localStorage (doppia chiave per compatibilità)
             try {
-                localStorage.setItem('pallet_optimizer_catalog_v1', JSON.stringify(catalog));
+                localStorage.setItem(STORAGE_KEY_CATALOG, jsonStr);
+                localStorage.setItem('pallet_optimizer_catalog_v1', jsonStr);
             } catch (e) {}
+
+            // 2) Salva su IndexedDB (persistente su Android/iOS PWA anche dopo chiusura totale)
+            writeCatalogToIDB(catalog);
+
+            // 3) Aggiorna anche l'hash URL senza ricaricare la pagina (utile su iOS Home Screen)
+            try {
+                if (window.history && window.history.replaceState && jsonStr.length < 32000) {
+                    const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+                    window.history.replaceState(null, '', `#cat=${encoded}`);
+                }
+            } catch (e) {}
+
             updateCatalogUI();
         }
 
@@ -1976,7 +1278,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
         }
 
         function buildIsometricBoxSVG(item, colorHex, isSelected) {
-            // Scala proporzionale delle dimensioni reali L, W, H dentro un box SVG 76x62
             const maxDim = Math.max(item.l, item.w, item.h, 30);
             const scale = 28 / maxDim;
             const l = Math.max(10, item.l * scale);
@@ -1986,17 +1287,14 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
             const cos30 = 0.866;
             const sin30 = 0.5;
 
-            // Centro base inferiore
             const cx = 38;
             const cy = 54;
 
-            // Vertici base inferiore (p0 = fronte basso, p1 = destra basso, p2 = retro basso, p3 = sinistra basso)
             const p0 = [cx, cy];
             const p1 = [cx + l * cos30, cy - l * sin30];
             const p3 = [cx - w * cos30, cy - w * sin30];
             const p2 = [p1[0] - w * cos30, p1[1] - w * sin30];
 
-            // Vertici faccia superiore traslati in alto di -h
             const t0 = [p0[0], p0[1] - h];
             const t1 = [p1[0], p1[1] - h];
             const t2 = [p2[0], p2[1] - h];
@@ -2007,15 +1305,10 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
 
             return `
                 <svg viewBox="0 0 76 62" class="w-16 h-14 mx-auto drop-shadow-sm">
-                    <!-- Ombra a terra -->
                     <polygon points="${pts([p0, p1, p2, p3])}" fill="#0f172a" fill-opacity="0.12" transform="translate(0, 2)"/>
-                    <!-- Faccia Sinistra -->
                     <polygon points="${pts([p0, p3, t3, t0])}" fill="${colorHex}" fill-opacity="0.82" stroke="${strokeColor}" stroke-width="1.1" stroke-linejoin="round"/>
-                    <!-- Faccia Destra -->
                     <polygon points="${pts([p0, p1, t1, t0])}" fill="${colorHex}" fill-opacity="0.65" stroke="${strokeColor}" stroke-width="1.1" stroke-linejoin="round"/>
-                    <!-- Faccia Superiore -->
                     <polygon points="${pts([t0, t1, t2, t3])}" fill="${colorHex}" fill-opacity="0.98" stroke="${strokeColor}" stroke-width="1.1" stroke-linejoin="round"/>
-                    <!-- Linea nastro adesivo centrale sul coperchio -->
                     <line x1="${((t0[0] + t3[0]) / 2).toFixed(1)}" y1="${((t0[1] + t3[1]) / 2).toFixed(1)}" x2="${((t1[0] + t2[0]) / 2).toFixed(1)}" y2="${((t1[1] + t2[1]) / 2).toFixed(1)}" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.3"/>
                 </svg>
             `;
@@ -2156,7 +1449,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                 const idx = catalog.findIndex(c => c.id === editId);
                 if (idx >= 0) {
                     catalog[idx] = { ...catalog[idx], code, desc, l, w, h, weight, maxLayers };
-                    // Aggiorna anche gli eventuali colli già presenti nella distinta corrente
                     state.shipmentItems.forEach(si => {
                         if (si.catalogId === editId) {
                             si.code = code;
@@ -2367,7 +1659,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
             catalog = validItems;
             saveCatalogToStorage();
             document.getElementById('paste-json-textarea').value = '';
-            showToast(`Catalogo importato con successo (${validItems.length} codici)!`, 'success');
+            showToast(`Catalogo importato e salvato (${validItems.length} codici)!`, 'success');
         }
 
         function importCatalogJSON(event) {
@@ -2475,7 +1767,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                 const htmlContent = buildStandaloneHtmlWithCurrentCatalog();
                 const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
 
-                // 1) Prova Web Share API con file (funziona su Chrome Android / Safari iOS fuori dall'iframe)
                 if (typeof navigator.share === 'function' && typeof File !== 'undefined') {
                     try {
                         const file = new File([blob], filename, { type: 'text/html' });
@@ -2490,11 +1781,9 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                         }
                     } catch (shareErr) {
                         if (shareErr && shareErr.name === 'AbortError') return;
-                        // Se NotAllowedError / SecurityError (es. inside iframe), prosegue col download
                     }
                 }
 
-                // 2) Download diretto del file .html
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -2506,7 +1795,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                 setTimeout(() => URL.revokeObjectURL(url), 2000);
 
                 if (hint) hint.classList.remove('hidden');
-                showToast(`Download avviato per "${filename}"! Se bloccato dall'anteprima, usa "Copia Codice HTML Completo".`, 'success');
+                showToast(`Download avviato per "${filename}"!`, 'success');
             } catch (e) {
                 if (hint) hint.classList.remove('hidden');
                 copyStandaloneHtmlCode();
@@ -2552,25 +1841,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                 showToast(`JSON del catalogo (${catalog.length} articoli) copiato! Incollalo su WhatsApp.`, 'success');
             } else {
                 showToast('Impossibile copiare il JSON.', 'error');
-            }
-        }
-
-        function copyShareableUrlWithCatalog() {
-            try {
-                const jsonStr = JSON.stringify(catalog);
-                const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
-                const baseUrl = window.location.href.split('#')[0];
-                const fullUrl = `${baseUrl}#cat=${encoded}`;
-
-                const tempInput = document.createElement('textarea');
-                tempInput.value = fullUrl;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand('copy');
-                tempInput.remove();
-                showToast('Link completo con catalogo copiato negli appunti!', 'success');
-            } catch (e) {
-                showToast('Errore nella copia del link.', 'error');
             }
         }
 
@@ -2982,7 +2252,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     }
                 });
 
-                // Appoggio solido >= 75% della base sulla stessa quota zTop sottostante (zero scatole sospese!)
                 if (bestZ !== null && bestOverlap >= boxArea * 0.75) {
                     supported.push({
                         ...pl,
@@ -3063,7 +2332,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
         }
 
         // =========================================================================
-        // 7. SIMULAZIONE SINGOLA PEDANA (SOLO PIANI PURI O PIANI MISTI CON APPOGGIO)
+        // 7. SIMULAZIONE SINGOLA PEDANA
         // =========================================================================
         function simulateSinglePalletPureLayers(pallet, remainingItems, maxCargoHeight, maxNetWeight, allowMixedCodes) {
             const layers = [];
@@ -3316,7 +2585,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
         }
 
         // =========================================================================
-        // 8. STRATEGIE DI OTTIMIZZAZIONE SPEDIZIONE (RISPETTANDO LE PEDANE SCELTE)
+        // 8. STRATEGIE DI OTTIMIZZAZIONE SPEDIZIONE
         // =========================================================================
         function isBetterPalletCandidate(cand, best, totalRemBoxes) {
             if (!best) return true;
@@ -3476,7 +2745,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
             const maxCargoH = getMaxCargoHeight();
             const activePallets = getActivePalletTypes();
 
-            // Verifica preliminare che almeno una scatola entri nelle pedane selezionate
             const optPure = packShipmentWithStrategy(state.shipmentItems, maxCargoH, 'PURE');
             const optBalanced = packShipmentBalancedWeight(state.shipmentItems, maxCargoH);
             const optFlex = packShipmentWithStrategy(state.shipmentItems, maxCargoH, 'FLEX');
@@ -3756,7 +3024,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
 
                 container.appendChild(card);
 
-                // Inizializza la scena Three.js per questa pedana
                 requestAnimationFrame(() => initThreeJSForPallet(idx, pData, maxTotalH));
             });
         }
@@ -3800,11 +3067,8 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                 <div class="text-center">
                     <div class="text-xs font-bold text-slate-700 mb-2">Pianta Strato Base (1) — Pedana ${p.l} × ${p.w} cm</div>
                     <svg viewBox="0 0 ${vbW} ${vbH}" class="w-full max-w-md mx-auto h-auto rounded-lg bg-white border border-slate-200 p-2">
-                        <!-- Sagoma pedana -->
                         <rect x="${pad}" y="${pad}" width="${p.l}" height="${p.w}" fill="#fef3c7" stroke="#d97706" stroke-width="1.2" stroke-dasharray="3,2"/>
-                        <!-- Scatole -->
                         ${rectsHtml}
-                        <!-- Quote L e W -->
                         <text x="${pad + p.l / 2}" y="${pad - 7}" text-anchor="middle" fill="#475569" font-size="6" font-weight="bold">${p.l} cm</text>
                         <text x="${pad - 8}" y="${pad + p.w / 2}" text-anchor="middle" fill="#475569" font-size="6" font-weight="bold" transform="rotate(-90 ${pad - 8} ${pad + p.w / 2})">${p.w} cm</text>
                     </svg>
@@ -3820,9 +3084,8 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
             const ctx = canvas.getContext('2d');
             const p = pData.pallet;
 
-            // Stato camera 3D interattiva (ruotabile 360° e zoomabile, 100% immune al limite WebGL su mobile)
-            let yaw = 0.68;      // rotazione orizzontale (radianti)
-            let pitch = 0.52;    // inclinazione verticale (radianti)
+            let yaw = 0.68;
+            let pitch = 0.52;
             let zoom = 1.0;
 
             function shadeHexColor(hex, factor) {
@@ -3834,7 +3097,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                 return `rgb(${r},${g},${b})`;
             }
 
-            // Pre-costruisce l'elenco di tutti i parallelepipedi da disegnare (pedana + scatole)
             const solids = [
                 {
                     cx: 0,
@@ -3891,7 +3153,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                 const cosP = Math.cos(pitch);
                 const sinP = Math.sin(pitch);
 
-                // Proiezione ortografica ruotata nello spazio 3D
                 function project(x, y, z) {
                     const yShifted = y - centerY;
                     const rx = x * cosY - z * sinY;
@@ -3905,7 +3166,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                     };
                 }
 
-                // Disegna il riquadro tratteggiato dell'ingombro massimo consentito
                 const hw = p.l / 2;
                 const hd = p.w / 2;
                 const limitCorners = [
@@ -3929,21 +3189,19 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                 ctx.stroke();
                 ctx.restore();
 
-                // Ordina i solidi dal più lontano al più vicino (Painter's Algorithm 3D)
                 const projectedSolids = solids.map(s => {
                     const cProj = project(s.cx, s.cy, s.cz);
-                    // Bias sulla quota verticale e profondità per un ordinamento perfetto tra strati e file
                     const sortKey = cProj.depth + s.cy * 0.02;
                     return { ...s, sortKey };
                 }).sort((a, b) => a.sortKey - b.sortKey);
 
                 const faceDefs = [
-                    { idx: [4, 5, 6, 7], nx: 0, ny: 1, nz: 0, shade: 1.08 },   // Top
-                    { idx: [0, 1, 2, 3], nx: 0, ny: -1, nz: 0, shade: 0.65 },  // Bottom
-                    { idx: [1, 2, 6, 5], nx: 1, ny: 0, nz: 0, shade: 0.88 },   // +X
-                    { idx: [0, 3, 7, 4], nx: -1, ny: 0, nz: 0, shade: 0.78 },  // -X
-                    { idx: [2, 3, 7, 6], nx: 0, ny: 0, nz: 1, shade: 0.95 },   // +Z
-                    { idx: [0, 1, 5, 4], nx: 0, ny: 0, nz: -1, shade: 0.72 }   // -Z
+                    { idx: [4, 5, 6, 7], nx: 0, ny: 1, nz: 0, shade: 1.08 },
+                    { idx: [0, 1, 2, 3], nx: 0, ny: -1, nz: 0, shade: 0.65 },
+                    { idx: [1, 2, 6, 5], nx: 1, ny: 0, nz: 0, shade: 0.88 },
+                    { idx: [0, 3, 7, 4], nx: -1, ny: 0, nz: 0, shade: 0.78 },
+                    { idx: [2, 3, 7, 6], nx: 0, ny: 0, nz: 1, shade: 0.95 },
+                    { idx: [0, 1, 5, 4], nx: 0, ny: 0, nz: -1, shade: 0.72 }
                 ];
 
                 projectedSolids.forEach(s => {
@@ -3961,7 +3219,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
                         project(s.cx - hx, s.cy + hy, s.cz + hz)
                     ];
 
-                    // Filtra e ordina solo le 3 facce visibili verso la camera
                     const visibleFaces = [];
                     faceDefs.forEach(f => {
                         const rnx = f.nx * cosY - f.nz * sinY;
@@ -3996,7 +3253,6 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
 
             renderScene();
 
-            // Interazioni touch e mouse (rotazione 360° e pinch-to-zoom)
             let isDragging = false;
             let prevX = 0;
             let prevY = 0;
@@ -4081,10 +3337,24 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
         // =========================================================================
         // 10. INIZIALIZZAZIONE
         // =========================================================================
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             renderPalletSelectionUI();
             updateCatalogUI();
             renderShipmentList();
+
+            // Se non era già presente su localStorage/URL, ripristina da IndexedDB (persistente su PWA)
+            if (initialBoot.source !== 'URL' && initialBoot.source !== 'STORAGE') {
+                const idbCatalog = await readCatalogFromIDB();
+                if (idbCatalog && idbCatalog.length > 0) {
+                    catalog = idbCatalog;
+                    try {
+                        localStorage.setItem(STORAGE_KEY_CATALOG, JSON.stringify(catalog));
+                    } catch (e) {}
+                    updateCatalogUI();
+                } else if (initialBoot.source === 'EMBEDDED') {
+                    saveCatalogToStorage();
+                }
+            }
         });
     </script>
 
